@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { ZodPipe } from 'src/zod/zod-pipe';
 import {
@@ -6,7 +14,9 @@ import {
   UserCreateSchema,
   UserCreateType,
 } from './dto/user-create.dto';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RequestWithUser } from './user.request.type';
 
 @ApiTags('User')
 @Controller('user')
@@ -24,8 +34,11 @@ export class UserController {
     return this.userService.register(body);
   }
 
-  @Get(':email')
-  findByEmail(@Param('email') email: string) {
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
+  @Get('email')
+  findByEmail(@Req() req: RequestWithUser) {
+    const email = req.user['email'];
     return this.userService.findOneByEmail(email);
   }
 }

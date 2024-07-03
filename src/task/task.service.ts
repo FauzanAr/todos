@@ -4,7 +4,6 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { TaskUpdateStatusType } from './dto/update-task-status.dto';
@@ -23,6 +22,9 @@ export class TaskService {
         where: {
           assignToId: ownerId,
         },
+        include: {
+          Comments: true,
+        },
       });
 
       return tasks;
@@ -38,6 +40,9 @@ export class TaskService {
         where: {
           status: categories,
           ownerId: ownerId,
+        },
+        include: {
+          Comments: true,
         },
       });
 
@@ -208,6 +213,27 @@ export class TaskService {
     } catch (error) {
       this.logger.error(`Error while update status task: ${error}`);
       throw new InternalServerErrorException('Error while update status task');
+    }
+  }
+
+  async findById(id: number, include = false) {
+    try {
+      const includeQuery = include
+        ? {
+            Comments: true,
+          }
+        : {};
+      const task = await this.database.todos.findFirst({
+        where: {
+          id,
+        },
+        include: includeQuery,
+      });
+
+      return task;
+    } catch (error) {
+      this.logger.error(`Error while get all tasks: ${error}`);
+      throw new InternalServerErrorException('Error while get all tasks');
     }
   }
 }

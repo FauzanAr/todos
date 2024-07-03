@@ -9,7 +9,6 @@ import { ZodError } from 'zod';
 @Catch(ZodError)
 export class ZodFilter<T extends ZodError> implements ExceptionFilter {
   catch(exception: ZodError, host: ArgumentsHost) {
-    console.log('MASOK');
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const status = HttpStatus.BAD_REQUEST;

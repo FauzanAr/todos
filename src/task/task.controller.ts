@@ -6,9 +6,11 @@ import {
   Param,
   Post,
   Put,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import {
   TaskCreateDtoSwagger,
   TaskCreateSchema,
@@ -25,14 +27,20 @@ import {
   TaskUpdateStatusSchema,
   TaskUpdateStatusType,
 } from './dto/update-task-status.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RequestWithUser } from 'src/user/user.request.type';
 
+@ApiTags('Task')
 @Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
   @Get()
-  getAll() {
-    return this.taskService.getAll();
+  getAll(@Req() req: RequestWithUser) {
+    const userId = req.user['userId'];
+    return this.taskService.getAll(+userId);
   }
 
   @Get(':category')

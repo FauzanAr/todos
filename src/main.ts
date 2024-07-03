@@ -19,6 +19,14 @@ async function bootstrap() {
     .setTitle('Todos API')
     .setDescription('The API description')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'access_token', // This name must match the name used in @ApiBearerAuth decorator
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);

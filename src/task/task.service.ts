@@ -17,9 +17,13 @@ export class TaskService {
   constructor(private readonly database: DatabaseService) {}
   private readonly logger = new Logger(TaskService.name);
 
-  async getAll() {
+  async getAll(ownerId: number) {
     try {
-      const tasks = await this.database.todos.findMany();
+      const tasks = await this.database.todos.findMany({
+        where: {
+          assignToId: ownerId,
+        },
+      });
 
       return tasks;
     } catch (error) {

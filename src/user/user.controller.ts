@@ -6,8 +6,9 @@ import {
   UserCreateSchema,
   UserCreateType,
 } from './dto/user-create.dto';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

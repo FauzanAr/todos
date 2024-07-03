@@ -1,6 +1,7 @@
 import {
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
@@ -10,6 +11,7 @@ import { hash } from 'src/helpers/utils/hash';
 @Injectable()
 export class UserService {
   constructor(private readonly database: DatabaseService) {}
+  private readonly logger = new Logger(UserService.name);
 
   async findOneByEmail(email: string) {
     try {
@@ -20,13 +22,13 @@ export class UserService {
       });
 
       if (!user) {
-        // AddLog
+        this.logger.error(`No user found!: ${user}`);
         throw new NotFoundException('No user found!');
       }
 
       return user;
     } catch (error) {
-      // AddLog
+      this.logger.error(`Error find by email: ${error}`);
       throw new InternalServerErrorException('Error while find by email');
     }
   }
@@ -42,13 +44,13 @@ export class UserService {
       });
 
       if (!users) {
-        // AddLog
+        this.logger.error(`No user found!: ${users}`);
         throw new InternalServerErrorException('Error while getting users');
       }
 
       return users;
     } catch (error) {
-      // AddLog
+      this.logger.error(`Error while getting user: ${error}`);
       throw new InternalServerErrorException('Error while get user');
     }
   }
@@ -66,7 +68,7 @@ export class UserService {
       });
 
       if (!user) {
-        // AddLog
+        this.logger.error(`Error while saving database: ${user}`);
         throw new InternalServerErrorException(
           'Error while saving data to database',
         );
@@ -75,7 +77,7 @@ export class UserService {
       delete user.password;
       return user;
     } catch (error) {
-      // AddLog
+      this.logger.error(`Error while create user: ${error}`);
       throw new InternalServerErrorException('Error while create user');
     }
   }

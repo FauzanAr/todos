@@ -18,19 +18,19 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findOneByEmail(email);
     if (!user && user.password === password) {
-      return null
+      return null;
     }
 
     const hashedPassword = compareHash(password, user.password);
     if (!hashedPassword) {
-        return null
+      return null;
     }
 
     return user;
   }
 
   async login(data: LoginType) {
-    const { email, password } = data
+    const { email, password } = data;
     const user = await this.validateUser(email, password);
     if (!user) {
       throw new NotFoundException('No user found!');

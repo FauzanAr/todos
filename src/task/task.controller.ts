@@ -40,40 +40,63 @@ export class TaskController {
   @Get()
   getAll(@Req() req: RequestWithUser) {
     const userId = req.user['userId'];
-    return this.taskService.getAll(+userId);
+    return this.taskService.getAll(userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
   @Get(':category')
-  getByCategory(@Param('category') category: string) {
-    return this.taskService.getByCategories(category);
+  getByCategory(
+    @Param('category') category: string,
+    @Req() req: RequestWithUser,
+  ) {
+    const userId = req.user['userId'];
+    return this.taskService.getByCategories(category, userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
   @Post()
   @ApiBody({ type: TaskCreateDtoSwagger })
-  createTask(@Body(new ZodPipe(TaskCreateSchema)) task: TaskCreateType) {
-    return this.taskService.createTask(task);
+  createTask(
+    @Body(new ZodPipe(TaskCreateSchema)) task: TaskCreateType,
+    @Req() req: RequestWithUser,
+  ) {
+    const userId = req.user['userId'];
+    return this.taskService.createTask(task, userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
   @Put(':id')
   @ApiBody({ type: TaskUpdateDtoSwagger })
   updateTask(
     @Param('id') id: string,
     @Body(new ZodPipe(TaskUpdateSchema)) task: TaskUpdateType,
+    @Req() req: RequestWithUser,
   ) {
-    return this.taskService.updateTask(+id, task);
+    const userId = req.user['userId'];
+    return this.taskService.updateTask(+id, task, userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
   @Delete(':id')
-  deleteTask(@Param('id') id: string) {
-    return this.taskService.deleteTask(+id);
+  deleteTask(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const userId = req.user['userId'];
+    return this.taskService.deleteTask(+id, userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
   @Put('status/:id')
   @ApiBody({ type: TaskUpdateStatusDtoSwagger })
   updateTaskStatus(
     @Param('id') id: string,
     @Body(new ZodPipe(TaskUpdateStatusSchema)) task: TaskUpdateStatusType,
+    @Req() req: RequestWithUser,
   ) {
-    return this.taskService.updateStatusTask(+id, task);
+    const userId = req.user['userId'];
+    return this.taskService.updateStatusTask(+id, task, userId);
   }
 }

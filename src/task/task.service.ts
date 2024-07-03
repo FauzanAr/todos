@@ -32,11 +32,12 @@ export class TaskService {
     }
   }
 
-  async getByCategories(categories: string) {
+  async getByCategories(categories: string, ownerId: number) {
     try {
       const tasks = await this.database.todos.findMany({
         where: {
           status: categories,
+          ownerId: ownerId,
         },
       });
 
@@ -49,9 +50,8 @@ export class TaskService {
     }
   }
 
-  async createTask(payload: TaskCreateType) {
+  async createTask(payload: TaskCreateType, ownerId: number) {
     try {
-      const ownerId = 2;
       const { assignToId, title, description, status, dueDate } = payload;
       const assigned = await this.database.user.findFirst({
         where: {
@@ -88,8 +88,7 @@ export class TaskService {
     }
   }
 
-  async updateTask(id: number, payload: TaskUpdateType) {
-    const ownerId = 5;
+  async updateTask(id: number, payload: TaskUpdateType, ownerId: number) {
     const { assignToId, description, dueDate, title } = payload;
 
     const task = await this.database.todos.findFirst({
@@ -110,7 +109,7 @@ export class TaskService {
       throw new ForbiddenException('Cannot update this task!');
     }
 
-    const dueAt = moment(dueDate).toString();
+    const dueAt = moment(dueDate).format();
     const updatedTask = await this.database.todos.update({
       where: {
         id,
@@ -129,13 +128,10 @@ export class TaskService {
     }
 
     return task;
-    // this.logger.error(`Error while creating task: ${error}`);
-    // throw new InternalServerErrorException('Error while creating task');
   }
 
-  async deleteTask(taskId: number) {
+  async deleteTask(taskId: number, ownerId: number) {
     try {
-      const ownerId = 5;
       const task = await this.database.todos.findFirst({
         where: {
           id: taskId,
@@ -167,9 +163,12 @@ export class TaskService {
     }
   }
 
-  async updateStatusTask(taskId: number, payload: TaskUpdateStatusType) {
+  async updateStatusTask(
+    taskId: number,
+    payload: TaskUpdateStatusType,
+    ownerId: number,
+  ) {
     try {
-      const ownerId = 5;
       const { status } = payload;
       const task = await this.database.todos.findFirst({
         where: {

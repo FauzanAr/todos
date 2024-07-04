@@ -14,6 +14,7 @@ async function bootstrap() {
   );
 
   app.useGlobalFilters(new ZodFilter());
+  app.enableCors();
 
   const config = new DocumentBuilder()
     .setTitle('Todos API')

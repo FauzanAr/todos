@@ -20,7 +20,7 @@ export class TaskService {
     try {
       const tasks = await this.database.todos.findMany({
         where: {
-          assignToId: ownerId,
+          OR: [{ ownerId: ownerId }, { assignToId: ownerId }],
         },
         include: {
           Comments: true,
@@ -39,7 +39,7 @@ export class TaskService {
       const tasks = await this.database.todos.findMany({
         where: {
           status: categories,
-          ownerId: ownerId,
+          OR: [{ ownerId: ownerId }, { assignToId: ownerId }],
         },
         include: {
           Comments: true,
@@ -155,11 +155,18 @@ export class TaskService {
         throw new ForbiddenException('Cannot delete this task!');
       }
 
-      await this.database.todos.delete({
-        where: {
-          id: taskId,
-        },
-      });
+      await this.database.$transaction([
+        this.database.comments.deleteMany({
+          where: {
+            todoId: taskId,
+          },
+        }),
+        this.database.todos.delete({
+          where: {
+            id: taskId,
+          },
+        }),
+      ]);
 
       return 'success';
     } catch (error) {
@@ -186,7 +193,7 @@ export class TaskService {
         throw new NotFoundException('No task found!');
       }
 
-      if (task.ownerId !== ownerId || task.assignToId !== ownerId) {
+      if (task.ownerId !== ownerId && task.assignToId !== ownerId) {
         this.logger.error(
           `TaskId: ${task.id} want to updated with OwnerId: ${ownerId}, AssignId: ${task.assignToId}, TaskOwnerId: ${task.ownerId}`,
         );

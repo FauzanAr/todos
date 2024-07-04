@@ -1,5 +1,5 @@
 import {
-    ForbiddenException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -25,8 +25,8 @@ export class CommentService {
     }
 
     if (task.assignToId !== userId && task.ownerId !== userId) {
-        this.logger.error(`task: ${JSON.stringify(task)}, userId: ${userId}`);
-        throw new ForbiddenException('Cannot add comment to this task!');
+      this.logger.error(`task: ${JSON.stringify(task)}, userId: ${userId}`);
+      throw new ForbiddenException('Cannot add comment to this task!');
     }
 
     const createComment = await this.database.comments.create({

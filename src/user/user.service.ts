@@ -13,7 +13,7 @@ export class UserService {
   constructor(private readonly database: DatabaseService) {}
   private readonly logger = new Logger(UserService.name);
 
-  async findOneByEmail(email: string) {
+  async findOneByEmail(email: string, needPassword = false) {
     try {
       const user = await this.database.user.findFirst({
         where: {
@@ -24,6 +24,10 @@ export class UserService {
       if (!user) {
         this.logger.error(`No user found!: ${user}`);
         throw new NotFoundException('No user found!');
+      }
+
+      if (!needPassword) {
+        delete user.password;
       }
 
       return user;
